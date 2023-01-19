@@ -33,7 +33,23 @@ Use Google APIs to list all email senders.
 * Browser opened to a YouTube video with developer console exposed.
 * NodeJS / NPM
 * Google App created and scopes assigned
-    
+
+## Basic Instructions
+
+To run this quickstart, you need the following prerequisites:
+
+### 1. Install Node.js & npm
+
+### 2. Create a [Google Cloud Project](https://developers.google.com/workspace/guides/create-project)
+
+### 3. Ensure you are using an account that has Google Drive and Gmail
+
+### 4. Enable APIs: Google Drive and Gmail
+
+### 5. Set scopes
+
+---
+
 ### Materials/References
 
 - https://developers.google.com/drive/api/quickstart/nodejs
