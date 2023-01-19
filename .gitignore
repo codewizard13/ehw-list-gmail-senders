@@ -104,3 +104,5 @@ sandbox/
 
 # ignore screenshots
 screens/
+token.json
+*credential*
