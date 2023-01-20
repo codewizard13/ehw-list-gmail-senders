@@ -13,9 +13,11 @@ const process = require('process');
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
 
+
 // If modifying these scopes, delete token.json.
 const SCOPES = [
-  'https://www.googleapis.com/auth/drive.metadata.readonly',
+  'https://www.googleapis.com/auth/gmail.metadata',
+  'https://www.googleapis.com/auth/gmail.readonly',
 ];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
@@ -80,7 +82,9 @@ async function authorize() {
  * Lists the names and IDs of up to 10 files.
  * @param {OAuth2Client} authClient An authorized OAuth2 client.
  */
-async function listFiles(authClient) {
+async function listSenders(authClient) {
+  const gmail = google.gmail
+  console.log({gmail})
   const drive = google.drive({ version: 'v3', auth: authClient });
   const res = await drive.files.list({
     pageSize: 10,
@@ -98,4 +102,4 @@ async function listFiles(authClient) {
   });
 }
 
-authorize().then(listFiles).catch(console.error);
+authorize().then(listSenders).catch(console.error);

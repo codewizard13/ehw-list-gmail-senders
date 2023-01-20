@@ -106,3 +106,5 @@ sandbox/
 screens/
 token.json
 *credential*
+
+*token.json*
