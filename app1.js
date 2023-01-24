@@ -17,8 +17,8 @@ Resources:
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
-const {authenticate} = require('@google-cloud/local-auth');
-const {google} = require('googleapis');
+const { authenticate } = require('@google-cloud/local-auth');
+const { google } = require('googleapis');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
@@ -89,7 +89,7 @@ async function authorize() {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function listLabels(auth) {
-  const gmail = google.gmail({version: 'v1', auth});
+  const gmail = google.gmail({ version: 'v1', auth });
   const res = await gmail.users.labels.list({
     userId: 'me',
   });
@@ -104,4 +104,44 @@ async function listLabels(auth) {
   });
 }
 
-authorize().then(listLabels).catch(console.error);
+
+// Test message id: 185e49fdaceef915
+async function ehwListLabels(auth) {
+  const gmail = google.gmail({ version: 'v1', auth })
+
+  let val = ''
+
+  // Get the messages response object
+  const res = await gmail.users.messages.list({
+    userId: 'me',
+  })
+
+  // Get the messages property from response
+  const messages = res.data.messages
+  
+  // Return early if there are no messages
+  if (!messages || messages.length === 0) {
+    console.log(`Sorry, no messages were found.`)
+    return
+  }
+
+  // Otherwise, loop through each message id and display message
+  console.log('Messages:')
+
+  // while (messages.get)
+
+  messages.forEach(async msgId => {
+    // const msg = gmail.Service.Users.Messages.Get('me', msgId.id)
+    const msg = await  gmail.users.messages.get({userId: 'me', id: msgId.id})
+    const data = msg.data
+    // const template = `Email ID: ${msg.data}`
+    const template = `Data: ${JSON.stringify(data, null, 3)}`
+    console.log(template)
+  })
+  
+}
+
+authorize()
+  // .then(listLabels).catch(console.error)
+  .then(ehwListLabels).catch(console.error)
+  .then(console.log(`\n`.repeat(10)))
