@@ -1,12 +1,19 @@
 /*
-SOURCE: https://developers.google.com/drive/api/quickstart/nodejs
-
 Programmer:   Eric Hepperle
-Date:         01/19/23
+Date:         01/24/23
 
-Working from Google APIs Quickstart and seeing if I can get info from my email account
+Purpose:
+Print email senders using GMail REST API and Oauth2.
+
+#GOTCHA: Must delete token.json everytime or you will get "insufficient permissions" error
+
+Based on: https://developers.google.com/drive/api/quickstart/nodejs
+
+Resources:
+- https://www.fullstacklabs.co/blog/access-mailbox-using-gmail-node
 
 */
+
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
@@ -23,7 +30,7 @@ const SCOPES = [
 // created automatically when the authorization flow completes for the first
 // time.
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), '../private/gmail.credentials.json');
+const CREDENTIALS_PATH = path.join(process.cwd(), 'private/gmail.credentials.json');
 
 /**
  * Reads previously authorized credentials from the save file.
