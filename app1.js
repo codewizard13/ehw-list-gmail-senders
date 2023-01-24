@@ -17,20 +17,18 @@ Resources:
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
-const { authenticate } = require('@google-cloud/local-auth');
-const { google } = require('googleapis');
-
+const {authenticate} = require('@google-cloud/local-auth');
+const {google} = require('googleapis');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = [
-  'https://www.googleapis.com/auth/gmail.metadata',
-  'https://www.googleapis.com/auth/gmail.readonly',
-];
+const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'private/gmail.credentials.json');
+// const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
+const CREDENTIALS_PATH = path.join(`${__dirname}`, './private/gmail.credentials.json');
+
 
 /**
  * Reads previously authorized credentials from the save file.
@@ -86,27 +84,24 @@ async function authorize() {
 }
 
 /**
- * Lists the names and IDs of up to 10 files.
- * @param {OAuth2Client} authClient An authorized OAuth2 client.
+ * Lists the labels in the user's account.
+ *
+ * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-async function listSenders(authClient) {
-  const gmail = google.gmail
-  console.log({gmail})
-  const drive = google.drive({ version: 'v3', auth: authClient });
-  const res = await drive.files.list({
-    pageSize: 10,
-    fields: 'nextPageToken, files(id, name)',
+async function listLabels(auth) {
+  const gmail = google.gmail({version: 'v1', auth});
+  const res = await gmail.users.labels.list({
+    userId: 'me',
   });
-  const files = res.data.files;
-  if (files.length === 0) {
-    console.log('No files found.');
+  const labels = res.data.labels;
+  if (!labels || labels.length === 0) {
+    console.log('No labels found.');
     return;
   }
-
-  console.log('Files:');
-  files.map((file) => {
-    console.log(`${file.name} (${file.id})`);
+  console.log('Labels:');
+  labels.forEach((label) => {
+    console.log(`- ${label.name}`);
   });
 }
 
-authorize().then(listSenders).catch(console.error);
+authorize().then(listLabels).catch(console.error);
