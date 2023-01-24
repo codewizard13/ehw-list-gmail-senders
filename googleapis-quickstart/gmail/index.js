@@ -7,7 +7,7 @@ Print email senders using GMail REST API and Oauth2.
 
 #GOTCHA: Must delete token.json everytime or you will get "insufficient permissions" error
 
-Based on: https://developers.google.com/drive/api/quickstart/nodejs
+Based on: https://developers.google.com/gmail/api/quickstart/nodejs
 
 Resources:
 - https://www.fullstacklabs.co/blog/access-mailbox-using-gmail-node
@@ -26,7 +26,7 @@ const dirname = `${__dirname}`
 
 // If modifying these scopes, delete token.json.
 const SCOPES = [
-  'https://www.googleapis.com/auth/gmail.metadata',
+  // 'https://www.googleapis.com/auth/gmail.metadata',
   'https://www.googleapis.com/auth/gmail.readonly',
 ];
 // The file token.json stores the user's access and refresh tokens, and is
