@@ -1,5 +1,14 @@
 /*
-SOURCE: https://developers.google.com/drive/api/quickstart/nodejs
+/*
+Programmer:   Eric Hepperle
+Date:         01/19/23
+
+Purpose:
+Working demo of authenticating with Oauth2 via Google Drive API and then listing name and ID of first 10 documents in drive.
+
+#GOTCHA: Must delete token.json everytime or you will get "insufficient permissions" error
+
+Based on: https://developers.google.com/drive/api/quickstart/nodejs
 
 */
 const fs = require('fs').promises;
