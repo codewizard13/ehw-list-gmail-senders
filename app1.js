@@ -107,6 +107,7 @@ async function listLabels(auth) {
 
 // Test message id: 185e49fdaceef915
 async function ehwListLabels(auth) {
+
   const gmail = google.gmail({ version: 'v1', auth })
 
   let val = ''
@@ -130,16 +131,51 @@ async function ehwListLabels(auth) {
 
   // while (messages.get)
 
-  messages.forEach(async msgId => {
+  const latestMsg = await gmail.users.messages.get({userId: 'me', id: messages[0].id})
+  // console.log(JSON.stringify(latestMsg.data, null, 2))
+
+  // console.log(latestMsg.data.payload)
+
+  // messages.forEach(async (msgId, i) => {
+    for (let i=0; i < messages.length; i++) {
     // const msg = gmail.Service.Users.Messages.Get('me', msgId.id)
+
+    const msgId = messages[i]
+
     const msg = await  gmail.users.messages.get({userId: 'me', id: msgId.id})
     const data = msg.data
-    // const template = `Email ID: ${msg.data}`
-    const template = `Data: ${JSON.stringify(data, null, 3)}`
+    const emailId = data.id
+    const snippet = data.snippet
+    const labels = data.labelIds
+
+    const payload = data.payload
+    // const sender = payload.headers({name: 'From'})
+    // const sender = payload.headers.filter(header => header.name === "From")
+    const sender = payload.headers.find(header => header.name === "From")
+
+
+    const template = sender
+
+    // const template = `
+    
+    // #######################################################
+
+    // EMAIL ID: ${emailId}
+    // ${snippet}
+    // ${labels.join(', ')}
+    // `
     console.log(template)
-  })
+
+
+    // While testing only print 4 results
+    if (i === 3) {break}
+
+  }
   
 }
+
+
+
 
 authorize()
   // .then(listLabels).catch(console.error)
