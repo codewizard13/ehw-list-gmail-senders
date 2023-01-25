@@ -128,6 +128,8 @@ async function listLabels(auth) {
 }
 
 
+
+
 async function buildMessagesDict(auth) {
 
   const dict = {
@@ -173,6 +175,7 @@ async function buildMessagesDict(auth) {
     // From:
     const sender = payload.headers.find(header => header.name === "From").value
     const [mailbox, displayName, email] = sender.match(/^(.*) <(.*)>$/)
+    const [,senderId, domain] = email.match(/^(.*)@(.*)$/)
 
     // Add sender to dict.emailAddresses
     dict.emailAddresses.add(email)
@@ -181,6 +184,7 @@ async function buildMessagesDict(auth) {
     let payloadParts = payload.parts.filter(part => part.mimeType === 'text/html')
 
     let payloadBodyText = ''
+
     payloadParts.forEach(part => {
       let htmlContent = Buffer.from( part.body.data, 'base64' ).toString('utf-8')
       const $ = cheerio.load(htmlContent)
@@ -195,7 +199,8 @@ async function buildMessagesDict(auth) {
 
     // Build dict for this email message:
     msgObj = {
-      sender: { email: email, displayName: displayName},
+      sender: { email: email, displayName: displayName, id: senderId, domain: domain},
+      snippet: snippet,
       labels: labels,
       payload: payloadBodyText
     }
@@ -207,6 +212,7 @@ async function buildMessagesDict(auth) {
 
   }
 
+  console.log(`dict.emailAddresses:`,dict.emailAddresses)
   // return our dictionary
   return dict
 
