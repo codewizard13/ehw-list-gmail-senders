@@ -119,7 +119,7 @@ async function ehwListLabels(auth) {
 
   // Get the messages property from response
   const messages = res.data.messages
-  
+
   // Return early if there are no messages
   if (!messages || messages.length === 0) {
     console.log(`Sorry, no messages were found.`)
@@ -131,18 +131,18 @@ async function ehwListLabels(auth) {
 
   // while (messages.get)
 
-  const latestMsg = await gmail.users.messages.get({userId: 'me', id: messages[0].id})
+  const latestMsg = await gmail.users.messages.get({ userId: 'me', id: messages[0].id })
   // console.log(JSON.stringify(latestMsg.data, null, 2))
 
   // console.log(latestMsg.data.payload)
 
   // messages.forEach(async (msgId, i) => {
-    for (let i=0; i < messages.length; i++) {
+  for (let i = 0; i < messages.length; i++) {
     // const msg = gmail.Service.Users.Messages.Get('me', msgId.id)
 
     const msgId = messages[i]
 
-    const msg = await  gmail.users.messages.get({userId: 'me', id: msgId.id})
+    const msg = await gmail.users.messages.get({ userId: 'me', id: msgId.id })
     const data = msg.data
     const emailId = data.id
     const snippet = data.snippet
@@ -157,7 +157,7 @@ async function ehwListLabels(auth) {
     const template = sender
 
     // const template = `
-    
+
     // #######################################################
 
     // EMAIL ID: ${emailId}
@@ -168,16 +168,38 @@ async function ehwListLabels(auth) {
 
 
     // While testing only print 4 results
-    if (i === 3) {break}
+    if (i === 3) { break }
 
   }
-  
+
 }
 
+/*
+{
+'erichepperle.jobs@gmail.com': {
+  sender: true,
+  receiver: true
+},
+'somespam@gmail.com': {
+  sender: true,
+  receiver: false
+}
 
+}
+*/
+async function buildEmailAddressesDict() {
+
+  const emailAdds = []
+
+  return 'hi'
+
+}
+let emailAddsDict = buildEmailAddressesDict()
+emailAddsDict.then((res) => console.log(res))
 
 
 authorize()
   // .then(listLabels).catch(console.error)
-  .then(ehwListLabels).catch(console.error)
+  .then(ehwListLabels)
   .then(console.log(`\n`.repeat(10)))
+  .catch(console.error)
