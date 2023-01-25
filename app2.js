@@ -16,6 +16,7 @@ Resources:
 - https://www.fullstacklabs.co/blog/access-mailbox-using-gmail-node
 - https://sigparser.com/developers/email-parsing/gmail-api/
 - https://blog.gsmart.in/parse-and-extract-data-from-gmail-to-google-sheets/
+- https://superuser.com/questions/1625686/what-is-the-email-address-format-name-email-called
 
 
 
@@ -166,28 +167,37 @@ async function buildMessagesDict(auth) {
     const labels = data.labelIds
 
     const payload = data.payload
-    const sender = payload.headers.find(header => header.name === "From")
+
+    // PARSE EMAIL ADDRESS
+
+    // From:
+    const sender = payload.headers.find(header => header.name === "From").value
+    const [mailbox, displayName, email] = sender.match(/^(.*) <(.*)>$/)
 
     // Add sender to dict.emailAddresses
+    dict.emailAddresses.add(email)
 
     // If payload has mimetype text or html, treat as text
-    let payloadData = payload.parts.filter(part => part.mimeType === 'text/html')
-    let pldLen = payloadData.length
-    payloadData.forEach(part => {
-      let decoded = Buffer.from( part.body.data, 'base64' ).toString('utf-8')
-      // console.log (decoded)
-      const $ = cheerio.load(decoded)
+    let payloadParts = payload.parts.filter(part => part.mimeType === 'text/html')
+
+    let payloadBodyText = ''
+    payloadParts.forEach(part => {
+      let htmlContent = Buffer.from( part.body.data, 'base64' ).toString('utf-8')
+      const $ = cheerio.load(htmlContent)
       let textContent = $('body').text().replace(/[\s\t]{3,900}/g, '\n')
       console.log(textContent)
+      payloadBodyText += `\n` + textContent
     })
-    // payloadData = Buffer.isBuffer(payloadData) ? 'Data is a buffer type' :  'Date is NOT a buffer'
+
     
 
-    // Build dict for this email message
+    
 
+    // Build dict for this email message:
     msgObj = {
+      sender: { email: email, displayName: displayName},
       labels: labels,
-      payload: payloadData 
+      payload: payloadBodyText
     }
 
     dict.messageData[emailId] = msgObj
@@ -198,7 +208,7 @@ async function buildMessagesDict(auth) {
   }
 
   // return our dictionary
-  // return dict
+  return dict
 
 }
 
