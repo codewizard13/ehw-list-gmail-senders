@@ -29,7 +29,7 @@ const process = require('process');
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
 const { sep } = require('path');
-// const cheerio = require('cheerio')
+const cheerio = require('cheerio')
 
 const separator_bar = '\n'.repeat(3) + '#'.repeat(50) + '\n'.repeat(2)
 
@@ -168,12 +168,17 @@ async function buildMessagesDict(auth) {
     const payload = data.payload
     const sender = payload.headers.find(header => header.name === "From")
 
+    // Add sender to dict.emailAddresses
+
     // If payload has mimetype text or html, treat as text
     let payloadData = payload.parts.filter(part => part.mimeType === 'text/html')
     let pldLen = payloadData.length
     payloadData.forEach(part => {
       let decoded = Buffer.from( part.body.data, 'base64' ).toString('utf-8')
-      console.log (decoded)
+      // console.log (decoded)
+      const $ = cheerio.load(decoded)
+      let textContent = $('body').text().replace(/[\s\t]{3,900}/g, '\n')
+      console.log(textContent)
     })
     // payloadData = Buffer.isBuffer(payloadData) ? 'Data is a buffer type' :  'Date is NOT a buffer'
     
