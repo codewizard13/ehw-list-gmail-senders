@@ -6,9 +6,11 @@ Date Modified:  01/25/23
 Purpose:
 Print email senders using GMail REST API and Oauth2.
 
-#GOTCHA: Must delete token.json everytime or you will get "insufficient permissions" error
-
 Based on: https://developers.google.com/drive/api/quickstart/nodejs
+
+#GOTCHAS:
+- Must delete token.json everytime or you will get "insufficient permissions" error
+- The 'gmail' object must be defined after a valid auth client is found, so it can't be a 'global' 
 
 Resources:
 - https://www.fullstacklabs.co/blog/access-mailbox-using-gmail-node
