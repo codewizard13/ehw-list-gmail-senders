@@ -1,6 +1,7 @@
 /*
-Programmer:   Eric Hepperle
-Date:         01/24/23
+Programmer:     Eric Hepperle
+Date:           01/24/23
+Date Modified:  01/25/23
 
 Purpose:
 Print email senders using GMail REST API and Oauth2.
@@ -12,6 +13,8 @@ Based on: https://developers.google.com/drive/api/quickstart/nodejs
 Resources:
 - https://www.fullstacklabs.co/blog/access-mailbox-using-gmail-node
 
+
+Version: 2
 */
 
 const fs = require('fs').promises;
@@ -104,105 +107,6 @@ async function listLabels(auth) {
   });
 }
 
-
-// Test message id: 185e49fdaceef915
-async function ehwListLabels(auth) {
-
-  const gmail = google.gmail({ version: 'v1', auth })
-
-  let val = ''
-
-  // Get the messages response object
-  const res = await gmail.users.messages.list({
-    userId: 'me',
-  })
-
-  // Get the messages property from response
-  const messages = res.data.messages
-
-  // Return early if there are no messages
-  if (!messages || messages.length === 0) {
-    console.log(`Sorry, no messages were found.`)
-    return
-  }
-
-  // Otherwise, loop through each message id and display message
-  console.log('Messages:')
-
-  // while (messages.get)
-
-  const latestMsg = await gmail.users.messages.get({ userId: 'me', id: messages[0].id })
-  // console.log(JSON.stringify(latestMsg.data, null, 2))
-
-  // console.log(latestMsg.data.payload)
-
-  // messages.forEach(async (msgId, i) => {
-  for (let i = 0; i < messages.length; i++) {
-    // const msg = gmail.Service.Users.Messages.Get('me', msgId.id)
-
-    const msgId = messages[i]
-
-    const msg = await gmail.users.messages.get({ userId: 'me', id: msgId.id })
-    const data = msg.data
-    const emailId = data.id
-    const snippet = data.snippet
-    const labels = data.labelIds
-
-    const payload = data.payload
-    // const sender = payload.headers({name: 'From'})
-    // const sender = payload.headers.filter(header => header.name === "From")
-    const sender = payload.headers.find(header => header.name === "From")
-
-
-    const template = sender
-
-    // const template = `
-
-    // #######################################################
-
-    // EMAIL ID: ${emailId}
-    // ${snippet}
-    // ${labels.join(', ')}
-    // `
-    console.log(template)
-
-
-    // While testing only print 4 results
-    if (i === 3) { break }
-
-  }
-
-}
-
-async function buildMessagesDict() {
-
-  
-
-}
-
-
-/*
-{
-'erichepperle.jobs@gmail.com': {
-  sender: true,
-  receiver: true
-},
-'somespam@gmail.com': {
-  sender: true,
-  receiver: false
-}
-
-}
-*/
-async function buildEmailAddressesDict() {
-
-  const emailAdds = []
-
-
-
-}
-let emailAddsDict = buildEmailAddressesDict()
-emailAddsDict.then((res) => console.log(res))
 
 
 authorize()
