@@ -14,6 +14,10 @@ Based on: https://developers.google.com/drive/api/quickstart/nodejs
 
 Resources:
 - https://www.fullstacklabs.co/blog/access-mailbox-using-gmail-node
+- https://sigparser.com/developers/email-parsing/gmail-api/
+- https://blog.gsmart.in/parse-and-extract-data-from-gmail-to-google-sheets/
+
+
 
 
 Version: 2
@@ -24,6 +28,10 @@ const path = require('path');
 const process = require('process');
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
+const { sep } = require('path');
+// const cheerio = require('cheerio')
+
+const separator_bar = '\n'.repeat(3) + '#'.repeat(50) + '\n'.repeat(2)
 
 
 // If modifying these scopes, delete token.json.
@@ -119,8 +127,80 @@ async function listLabels(auth) {
 }
 
 
+async function buildMessagesDict(auth) {
+
+  const dict = {
+    messageData: {},
+    emailAddresses: new Set()
+  }
+
+  const gmail = google.gmail({ version: 'v1', auth })
+
+  // Get the messages response object
+  const msgsResp = await gmail.users.messages.list({ userId: 'me' })
+
+  // Get the messages property from response
+  const messages = msgsResp.data.messages
+
+  // Return early if there are no messages
+  if (!messages || messages.length === 0) {
+    console.log(`Sorry, no messages were found.`)
+    return
+  }
+
+  // Otherwise, loop through each message id and display message
+  console.log('Messages:')
+
+  // while (messages.get)
+
+  const latestMsg = await gmail.users.messages.get({ userId: 'me', id: messages[0].id })
+
+  for (let i = 0; i < messages.length; i++) {
+
+    const msgId = messages[i]
+
+    const msg = await gmail.users.messages.get({ userId: 'me', id: msgId.id })
+    const data = msg.data
+    const emailId = data.id
+    const snippet = data.snippet
+    const labels = data.labelIds
+
+    const payload = data.payload
+    const sender = payload.headers.find(header => header.name === "From")
+
+    // If payload has mimetype text or html, treat as text
+    let payloadData = payload.parts.filter(part => part.mimeType === 'text/html')
+    let pldLen = payloadData.length
+    payloadData.forEach(part => {
+      let decoded = Buffer.from( part.body.data, 'base64' ).toString('utf-8')
+      console.log (decoded)
+    })
+    // payloadData = Buffer.isBuffer(payloadData) ? 'Data is a buffer type' :  'Date is NOT a buffer'
+    
+
+    // Build dict for this email message
+
+    msgObj = {
+      labels: labels,
+      payload: payloadData 
+    }
+
+    dict.messageData[emailId] = msgObj
+
+    // While testing only print 4 results
+    if (i === 1) { break }
+
+  }
+
+  // return our dictionary
+  // return dict
+
+}
+
+
 
 authorize()
-  .then(listLabels)
-  .then(console.log(`\n`.repeat(5)))
+  // .then(listLabels)
+  .then(buildMessagesDict).then(res => console.log(JSON.stringify(res,null,3)))
+  .then(console.log(separator_bar))
   .catch(console.error)
