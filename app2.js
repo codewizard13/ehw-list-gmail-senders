@@ -175,7 +175,8 @@ async function buildMessagesDict(auth) {
     // From:
     const sender = payload.headers.find(header => header.name === "From").value
     const [mailbox, displayName, email] = sender.match(/^(.*) <(.*)>$/)
-    const [,senderId, domain] = email.match(/^(.*)@(.*)$/)
+    const [, senderId, domain] = email.match(/^(.*)@(.*)$/)
+    // console.log(`Email: ${mailbox}`)
 
     // Add sender to dict.emailAddresses
     dict.emailAddresses.add(email)
@@ -186,33 +187,31 @@ async function buildMessagesDict(auth) {
     let payloadBodyText = ''
 
     payloadParts.forEach(part => {
-      let htmlContent = Buffer.from( part.body.data, 'base64' ).toString('utf-8')
+      let htmlContent = Buffer.from(part.body.data, 'base64').toString('utf-8')
       const $ = cheerio.load(htmlContent)
       let textContent = $('body').text().replace(/[\s\t]{3,900}/g, '\n')
-      console.log(textContent)
+      // console.log(textContent)
       payloadBodyText += `\n` + textContent
     })
 
-    
-
-    
-
     // Build dict for this email message:
     msgObj = {
-      sender: { email: email, displayName: displayName, id: senderId, domain: domain},
+      sender: { email: email, displayName: displayName, id: senderId, domain: domain },
       snippet: snippet,
       labels: labels,
       payload: payloadBodyText
     }
 
+    console.log(`msgObj: `, msgObj)
+
     dict.messageData[emailId] = msgObj
 
     // While testing only print 4 results
-    if (i === 1) { break }
+    // if (i === 1) { break }
 
   }
 
-  console.log(`dict.emailAddresses:`,dict.emailAddresses)
+  console.log(`dict.emailAddresses:`, dict.emailAddresses)
   // return our dictionary
   return dict
 
@@ -222,6 +221,7 @@ async function buildMessagesDict(auth) {
 
 authorize()
   // .then(listLabels)
-  .then(buildMessagesDict).then(res => console.log(JSON.stringify(res,null,3)))
+  .then(buildMessagesDict)
+  // .then(buildMessagesDict).then(res => console.log(JSON.stringify(res, null, 3)))
   .then(console.log(separator_bar))
   .catch(console.error)
